@@ -1,0 +1,54 @@
+#version 410 core
+
+in vec3 Normal;
+in vec3 VertexPos;
+in float ColorVar;
+in vec2 TexCoord;
+
+out vec4 outColor;
+
+struct s_material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+}; 
+
+uniform float       UtextureDepth;
+uniform s_material  Umaterial;
+uniform vec3        UmodelColor;
+uniform vec3        UlightColor;
+uniform vec3        UlightPos;
+uniform vec3        UcameraDir;
+uniform sampler2D   UTexture;
+uniform int         UisLightOn;
+
+vec3 normal;
+vec3 lightDir;
+
+vec3    finalColor;
+vec3    ambient;
+vec3    diffuse;
+float   diffuseAngle;
+vec3    specular;
+float   specularValue;
+vec3    viewDir;
+vec3    reflectDir;
+
+void main()
+{
+    ambient = UmodelColor * ColorVar * Umaterial.ambient;
+
+    normal = normalize(Normal);
+    lightDir = normalize(UlightPos - VertexPos);
+    diffuseAngle = max(dot(lightDir, normal), 0);
+    diffuse = UmodelColor * diffuseAngle * Umaterial.diffuse * float(UisLightOn);
+ 
+    reflectDir = lightDir - (2.f * dot(normal, lightDir) * normal);
+    viewDir = UcameraDir;
+    specularValue = pow(max(dot(reflectDir, -viewDir), 0), Umaterial.shininess);
+    specular = UmodelColor * specularValue * Umaterial.specular * float(UisLightOn);
+
+    vec3 result = ambient + diffuse + specular;
+    outColor = vec4(result, 1.0) * (1.f - UtextureDepth) + texture(UTexture, TexCoord) * UtextureDepth;
+}

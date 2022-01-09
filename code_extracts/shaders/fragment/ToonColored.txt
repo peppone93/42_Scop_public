@@ -1,0 +1,71 @@
+#version 410 core
+
+in vec3 Normal;
+in vec3 VertexPos;
+
+out vec4 outColor;
+
+struct s_material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+}; 
+  
+uniform s_material  Umaterial;
+uniform vec3        UmodelColor;
+uniform vec3        UlightColor;
+uniform vec3        UlightPos;
+uniform vec3        UcameraDir;
+uniform int         UisLightOn;
+
+vec3 normal;
+vec3 lightDir;
+
+vec3    finalColor;
+vec3    ambient;
+vec3    diffuse;
+vec3    specular;
+float   specularValue;
+float   diffuseAngle;
+float   threshold;
+vec3    viewDir;
+vec3    reflectDir;
+vec3    toon;
+
+void main()
+{
+    ambient = UlightColor * Umaterial.ambient * 0.5f;
+
+    normal = normalize(Normal);
+    lightDir = normalize(UlightPos - VertexPos);
+    diffuseAngle = max(dot(normal, lightDir), 0.0);
+    diffuse = UlightColor * diffuseAngle * Umaterial.diffuse;
+
+    reflectDir = lightDir - (2.f * dot(normal, lightDir) * normal);
+    viewDir = UcameraDir;
+    specularValue = pow(max(dot(reflectDir, -viewDir), 0), Umaterial.shininess);
+    specular = UmodelColor * specularValue * Umaterial.specular * 2.f;
+
+    vec3 result = diffuse + specular;
+
+	  threshold = dot(lightDir, normal);
+
+    if (threshold > 0.95f)
+       result = result * 1.f * float(UisLightOn);
+    else if (threshold > 0.88f)
+       result = result * 0.92f * float(UisLightOn);
+    else if (threshold > 0.75)
+	     result = result * 0.8f * float(UisLightOn);
+  	else if (threshold > 0.55)
+	  	result = result * 0.6f * float(UisLightOn);
+	  else if (threshold > 0.38)
+	  	result = result * 0.4f * float(UisLightOn);
+    else if (threshold > 0.20)
+	  	result = result * 0.2f * float(UisLightOn);
+	  else
+	  	result = result * 0.05f * float(UisLightOn);
+
+    result += ambient;
+    outColor = vec4(UmodelColor, 1.f) * vec4(result, 1.f);
+}

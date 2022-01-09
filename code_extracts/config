@@ -1,0 +1,6 @@
+COLOR[255,255,255] #0-255,0-255,0-255
+MATERIAL[Rubber] #Rubber, Metal, Plastic, Wood
+TEXTURENAME[World.bmp] #sample.bmp
+TEXTUREMODE[Spheric] #Cubic , Spheric
+VERTEXSHADER[Complete.vshade]  #Complete.vshade
+FRAGMENTSHADER[42.fshade] #BasicColored.fshade
