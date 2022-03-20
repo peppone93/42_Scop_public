@@ -39,7 +39,7 @@ __Bonus options:__
 
 <p align="center">
   <img src="Screens/Video1.gif" width="400"/>
-  <img src="Screens/Video2.gif" width="400"/> 
+  <img src="Screens/Video_2.gif" width="400"/> 
 </p>
 
 _If you are interested in the complete code, please do not hesitate to contact me._
